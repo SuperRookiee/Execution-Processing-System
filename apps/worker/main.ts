@@ -87,18 +87,18 @@ async function runWorker() {
 
   while (true) {
     // 블록 방식으로 메시지 소비
-    const streams = await redis.xreadgroup(
+    const streams = (await redis.xreadgroup(
       'GROUP',
       groupName,
       consumerName,
-      'BLOCK',
-      5000,
       'COUNT',
       1,
+      'BLOCK',
+      5000,
       'STREAMS',
       streamKey,
       '>',
-    );
+    )) as [string, [string, string[]][]][] | null;
 
     if (!streams) {
       continue;

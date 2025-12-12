@@ -20,6 +20,9 @@ export class QueueService {
       JSON.stringify({ ...payload, attempt }),
     );
     this.logger.log(`큐에 메시지 추가: ${entryId}`);
+    if (!entryId) {
+      throw new Error('메시지 ID를 가져오지 못했습니다.');
+    }
     return entryId;
   }
 }
