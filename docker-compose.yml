@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: rootpassword
+      DB_NAME: execution_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      EXECUTION_STREAM: execution_stream
+      EXECUTION_GROUP: execution_group
+      EXECUTION_CONSUMER: api-server
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: npm run worker
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: rootpassword
+      DB_NAME: execution_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      EXECUTION_STREAM: execution_stream
+      EXECUTION_GROUP: execution_group
+      EXECUTION_CONSUMER: worker-1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: execution_db
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "3306:3306"
+    volumes:
+      - excution_processing_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  excution_processing_data:
