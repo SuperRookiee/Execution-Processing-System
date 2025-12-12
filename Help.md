@@ -1,7 +1,7 @@
 # 실행 방법 및 로직 설명 (Execution Processing System)
 
 ## 사전 준비
-- Node.js 18+와 npm
+- Node.js 22+와 npm
 - MySQL, Redis 실행 환경
 - 환경 변수 설정 (필요 시 `.env`):
   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME`
